@@ -1,0 +1,16 @@
+compression-webpack-plugin :该插件能够将资源文件压缩为.gz文件，并且根据客户端的需求按需加载
+
+
+
+像 react 这个库的核心代码就有 627 KB，这样和我们的源代码放在一起打包，体积肯定会很大。所以可以在 webpack 中设置
+
+{
+  entry: {
+   bundle: 'app'
+    vendor: ['react']
+  }
+
+  plugins: {
+    new webpack.optimize.CommonsChunkPlugin('vendor',  'vendor.js')
+  }
+}
