@@ -17,11 +17,11 @@ var webpack = require('webpack');
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.resolve(ROOT_PATH, 'app');
 var BUILD_PATH = path.resolve(ROOT_PATH, 'build');
-process.env.NODE_ENV='development';
+process.env.NODE_ENV = 'development';
 console.log(process.env.NODE_ENV);
 var DEBUG = process.env.NODE_ENV !== 'production' ? true : false;
 console.log(DEBUG);
-var hrm = ['webpack-hot-middleware/client?reload=true','react-hot-loader/patch','webpack/hot/only-dev-server','babel-polyfill']
+var hrm = ['webpack-hot-middleware/client?reload=true', 'react-hot-loader/patch', 'webpack/hot/only-dev-server', 'babel-polyfill']
 module.exports = {
     //要启用source-map需加上此配置项，同时css或less的loader要加上参数?sourceMap，js的loader不用加
     // devtool: 'source-map',
@@ -30,7 +30,7 @@ module.exports = {
         // client:['webpack-dev-server/client?http://localhost:3000'],
         index: [...hrm, './app/page/index/index.js'],
         order: [...hrm, './app/page/order/order.js']
-       
+
         // vendor: ['react'],
     },
     //输出的文件名 合并以后的js会命名为bundle.js
@@ -42,30 +42,28 @@ module.exports = {
 
     },
     cache: false,
-    devtool: "source-map",  
+    devtool: "source-map",
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.less$/,
+                include: [path.join(__dirname, 'app'), path.resolve(__dirname, 'node_modules/antd')],
                 use: ExtractTextPlugin.extract({
                     use: [{
                         loader: "css-loader"
-                    },
-                    {
+                    }, {
                         loader: 'postcss-loader',
-                    },
-                    {
+                    }, {
                         loader: "less-loader"
                     }],
                     // use style-loader in development 
                     fallback: "style-loader"
                 })
-            }
-            ,
+            },
             //处理sass
             {
                 test: /\.scss$/,
-                use:ExtractTextPlugin.extract({
+                include: [path.join(__dirname, 'app'), path.resolve(__dirname, 'node_modules/antd')],
+                use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use: [{
                             loader: "css-loader",
@@ -74,13 +72,11 @@ module.exports = {
                                 sourceMap: true,
                                 minimize: true, //压缩
                                 localIdentName: '[local]--[hash:base64:5]',
-                                
+
                             }
-                        },
-                        {
+                        }, {
                             loader: 'postcss-loader',
-                        },
-                        {
+                        }, {
                             loader: "sass-loader" // compiles Sass to CSS 
                         }
 
@@ -90,42 +86,42 @@ module.exports = {
             //.css文件使用style-loader和css-loader来处理
             {
                 test: /\.css$/,
-                use:ExtractTextPlugin.extract({
+                include: [path.resolve(__dirname, 'node_modules/antd')],
+                use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use: [{
-                            loader: 'css-loader',
-                            options: {
-                                modules:true ,
-                                sourceMap: true,
-                                minimize: true, //压缩
-                                localIdentName: '[local]--[hash:base64:5]',
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                            sourceMap: true,
+                            minimize: true, //压缩
+                            localIdentName: '[local]--[hash:base64:5]',
 
-                            }
-                        },
-                        {
-                            loader: 'postcss-loader',
                         }
-                    ]
+                    }, {
+                        loader: 'postcss-loader',
+                    }]
                 })
-            },
-            {
+            }, {
                 test: /\.(jsx|js)$/i,
                 exclude: /(node_modules)/,
-                include: path.join(__dirname, 'app'),
+                include: [path.join(__dirname, 'app')],
                 use: [{
                     loader: 'babel-loader',
                     options: {
                         presets: [
                             ['es2015', {
-                                modules:false
+                                modules: false
                             }], 'stage-1', 'react'
                         ],
-                        plugins: ['react-hot-loader/babel',["import", { libraryName: "antd", style: true }]]
+                        plugins: ['react-hot-loader/babel', ["import", {
+                            "libraryName": "antd",
+                            "style": true
+                        }]]
                     }
                 }]
 
-            },
-            {
+            }, {
                 test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
                 loader: 'url-loader',
                 options: {
@@ -155,31 +151,31 @@ module.exports = {
         new HtmlwebpackPlugin({
             title: 'order',
             filename: 'order.html',
-            template: path.resolve(__dirname,'./app/page/order/order.html'),
+            template: path.resolve(__dirname, './app/page/order/order.html'),
             inject: 'body',
             chunks: ['order'],
             cache: false,
-            hash:false
+            hash: false
         }),
         new HtmlwebpackPlugin({
             title: 'index',
             filename: 'index.html',
-            template: path.resolve(__dirname,'./app/page/index/index.html'),
+            template: path.resolve(__dirname, './app/page/index/index.html'),
             inject: 'body',
             chunks: ['index'],
             cache: false,
-            hash:false
+            hash: false
         }),
         new ExtractTextPlugin({
             // filename: '[name]-min-[hash].css',
             filename: '[name].css',
             allChunks: true,
-            disable:DEBUG,//开发环境禁用
+            disable: DEBUG, //开发环境禁用
 
         }),
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV:JSON.stringify('development')//'production'
+                NODE_ENV: JSON.stringify('development') //'production'
             }
         })
         // new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.js' }),
