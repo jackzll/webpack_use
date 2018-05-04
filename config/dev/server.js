@@ -11,5 +11,6 @@ app.use(require("webpack-dev-middleware")(compiler, {
 }));
 app.use(webpackHotMiddleware(compiler));
 app.listen(3000, function() {
-	console.log(`port----3000`);
+	console.log(`port:3000`);
+	console.log(`env:${process.env.NODE_ENV }`);
 })

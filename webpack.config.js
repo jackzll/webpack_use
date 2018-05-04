@@ -6,14 +6,16 @@ var CleanPlugin = require("clean-webpack-plugin");
 var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var path = require('path');
-
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.join(ROOT_PATH, 'src');
-var DEBUG = process.env.NODE_ENV !== 'production' ? true : false;
+console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+var DEBUG = process.env.NODE_ENV === 'development';
 //热更新
 var devhrm = ['babel-polyfill'];
-var devPlus = [];
+var devPlus = [new CleanPlugin('dist')];
+var env = process.env.NODE_ENV;
 if (DEBUG) {
+    env = 'development';
     devhrm = ['webpack-hot-middleware/client?reload=true', 'react-hot-loader/patch', 'webpack/hot/only-dev-server', 'babel-polyfill'];
     devPlus = [
         new webpack.HotModuleReplacementPlugin(),
@@ -104,9 +106,7 @@ module.exports = {
                     loader: 'babel-loader',
                     options: {
                         presets: [
-                            ['es2015', {
-                                modules: false
-                            }], 'stage-1', 'react'
+                            "env", "react", "stage-1"
                         ],
                         plugins: ['react-hot-loader/babel', ["import", {
                             "libraryName": "antd",
@@ -129,7 +129,7 @@ module.exports = {
         new HtmlwebpackPlugin({
             title: 'order',
             filename: 'order.html',
-            template: path.resolve(__dirname, './src/page/order/order.html'),
+            template: path.resolve(__dirname, './src/entries/order/order.html'),
             inject: 'body',
             chunks: ['order'],
             cache: false,
@@ -138,7 +138,7 @@ module.exports = {
         new HtmlwebpackPlugin({
             title: 'index',
             filename: 'index.html',
-            template: path.resolve(__dirname, './src/page/index/index.html'),
+            template: path.resolve(__dirname, './src/entries/index/index.html'),
             inject: 'body',
             chunks: ['index'],
             cache: false,
@@ -152,7 +152,7 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             'process.env': {
-                NODE_ENV: JSON.stringify('development') //'production'
+                NODE_ENV: JSON.stringify(env) //'production'
             }
         }),
         new webpack.optimize.CommonsChunkPlugin({
