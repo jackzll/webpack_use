@@ -6,31 +6,51 @@ var CleanPlugin = require("clean-webpack-plugin");
 var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+var HtmlStringReplace = require('html-string-replace-webpack-plugin');
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.join(ROOT_PATH, 'src');
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
+
 var DEBUG = process.env.NODE_ENV === 'development';
 //热更新
 var devhrm = ['babel-polyfill'];
-var devPlus = [new CleanPlugin('dist')];
+var devPlus = [
+    new CleanPlugin('dist'),
+    new CopyWebpackPlugin([{
+        from: './src/lib/*',
+        to: path.join(__dirname, 'dist'),
+        flatten: true, //只拷贝文件不管文件夹
+    }], {
+        ignore: [],
+        context: __dirname
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+        compress: {
+            warnings: false,
+            drop_debugger: true,
+            drop_console: true
+        }
+    })
+];
 var env = process.env.NODE_ENV;
+//开发环境
 if (DEBUG) {
     env = 'development';
     devhrm = ['webpack-hot-middleware/client?reload=true', 'react-hot-loader/patch', 'webpack/hot/only-dev-server', 'babel-polyfill'];
     devPlus = [
         new webpack.HotModuleReplacementPlugin(),
-        new webpack.NamedModulesPlugin()
+        new webpack.NamedModulesPlugin(),
     ];
 }
 module.exports = {
     entry: {
         index: [...devhrm, './src/entries/index/index.js'],
         order: [...devhrm, './src/entries/order/order.js'],
-        lib: ['react', 'react-dom', 'antd']
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: '[name].js'
+        filename: '[name].js',
     },
     resolve: {
         //用于指明程序自动补全识别哪些后缀，注意一下，extensions 第一个是空字符串，对应不需要后缀的情况。
@@ -144,6 +164,15 @@ module.exports = {
             cache: false,
             hash: false
         }),
+        new HtmlStringReplace({
+            enable:!DEBUG,
+            patterns: [{
+                match:/..\/..\/lib\/lib.js/g,
+                replacement: function(match) {
+                    return './lib.js';
+                }
+            }, ]
+        }),
         new ExtractTextPlugin({
             filename: '[name]-min-[hash].css',
             allChunks: true,
@@ -155,17 +184,21 @@ module.exports = {
                 NODE_ENV: JSON.stringify(env) //'production'
             }
         }),
+        new webpack.DllReferencePlugin({
+            context: __dirname,
+            manifest: require('./lib_manifest.json')
+        }),
+        // new webpack.optimize.CommonsChunkPlugin({
+        //     name: 'lib',
+        //     chunks: ['lib'],
+        //     minChunks: Infinity,
+        //     filename: 'lib.js'
+        // }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
             minChunks: 2,
             chunks: ['index', 'order'],
             filename: 'vendor.js'
         }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'lib',
-            chunks: ['lib'],
-            minChunks: Infinity,
-            filename: 'lib.js'
-        })
     ]
 }
