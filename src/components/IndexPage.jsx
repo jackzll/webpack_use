@@ -461,6 +461,7 @@ class IndexPage extends React.Component{
 		 	);
 		}else{
 			return 	(<div style={{width:1000,margin:'0 auto',paddingTop:24}}>
+					<img src={require('../images/1.png')}/>
 					<MainArea data={this.state.mianData} common={common}  onChange={this.MainAreaChange} getRefs={this.getRefs}/>
 					<MultiVoucher data={this.state.vouchers} common={common} getRefs={this.getRefs} onChange={this.VoucherChange} voucherChange={this.VouchersItemChange} activeKey={this.state.activeKey}/>
 					<FormItem {...formItemLayout} label=" " colon={false}>

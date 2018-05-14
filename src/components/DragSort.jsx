@@ -7,6 +7,7 @@ import {createStore} from 'redux';
 import HTML5Backend from 'react-dnd-html5-backend'
 import {DragSource,DropTarget,DragDropContext} from 'react-dnd';
 import flow from 'lodash/flow';
+import _ from 'lodash';
 require("babel-polyfill");//引入es6api方法;
 //退拽
 let ItemTypes={
