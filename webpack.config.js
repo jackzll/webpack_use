@@ -11,7 +11,7 @@ var HtmlStringReplace = require('html-string-replace-webpack-plugin');
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.join(ROOT_PATH, 'src');
 console.log('process.env.NODE_ENV', process.env.NODE_ENV);
-
+var libConfig=require('./lib_manifest.json');
 var DEBUG = process.env.NODE_ENV === 'development';
 //热更新
 var devhrm = ['babel-polyfill'];
@@ -47,6 +47,7 @@ module.exports = {
     entry: {
         index: [...devhrm, './src/entries/index/index.js'],
         order: [...devhrm, './src/entries/order/order.js'],
+        lib:['./src/lib/lib.js']
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -56,8 +57,8 @@ module.exports = {
         //用于指明程序自动补全识别哪些后缀，注意一下，extensions 第一个是空字符串，对应不需要后缀的情况。
         extensions: ['.js', '.jsx', '.css', '.scss'],
     },
-    externals: {
-        "jquery": "jQuery"
+    externals:{
+        "jquery": "jQuery",
     },
     cache: false,
     devtool: "source-map",
@@ -120,8 +121,8 @@ module.exports = {
                 })
             }, {
                 test: /\.(jsx|js)$/i,
-                exclude: /(node_modules)/,
-                include: [APP_PATH],
+                exclude:[path.resolve(ROOT_PATH, 'node_modules'),path.resolve(ROOT_PATH,'src/lib')],
+                include:[APP_PATH],
                 use: [{
                     loader: 'babel-loader',
                     options: {
@@ -135,13 +136,14 @@ module.exports = {
                     }
                 }]
 
-            }, {
+            },{
                 test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
                 loader: 'url-loader',
                 options: {
                     limit: 10000
                 }
             }
+
         ]
     },
     plugins: [
@@ -184,16 +186,16 @@ module.exports = {
                 NODE_ENV: JSON.stringify(env) //'production'
             }
         }),
-        new webpack.DllReferencePlugin({
-            context: __dirname,
-            manifest: require('./lib_manifest.json')
-        }),
-        // new webpack.optimize.CommonsChunkPlugin({
-        //     name: 'lib',
-        //     chunks: ['lib'],
-        //     minChunks: Infinity,
-        //     filename: 'lib.js'
+        // new webpack.DllReferencePlugin({
+        //     context: __dirname,
+        //     manifest: require('./lib_manifest.json')
         // }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'lib',
+            chunks: ['lib'],
+            minChunks: Infinity,
+            filename: 'lib.js'
+        }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor',
             minChunks: 2,

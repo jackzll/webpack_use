@@ -9,7 +9,6 @@ module.exports = {
         library: "lib_[hash]"
     },
     plugins: [
-
         new webpack.DllPlugin({
             context: __dirname,
             name: "lib_[hash]",
